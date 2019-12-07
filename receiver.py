@@ -33,10 +33,10 @@ if __name__ == '__main__':
             return_val, frame = cap.read()
             decoded_objects = decode(frame, symbols=[ZBarSymbol.CODE128, ZBarSymbol.QRCODE])
 
-            if decoded_objects:
-                print(decoded_objects[0].type, decoded_objects[0].data[:10])
-
             if not started:
+                cv2.imshow("Preview", frame)
+                cv2.waitKey(100)
+
                 for a in decoded_objects:
                     if a.type == 'QRCODE':
                         start_frame = a.data.decode('ascii').split('#')
@@ -46,8 +46,6 @@ if __name__ == '__main__':
                             chunk_size = int(start_frame[2])
                             started = True
                             expect_control_frame = True
-                    # else:
-                    #     sleep(0.1)
             else:
                 for a in decoded_objects:
                     if a.type == 'CODE128' and expect_control_frame:
@@ -63,14 +61,12 @@ if __name__ == '__main__':
                         print("QRCODE OK")
                         f.write(a.data)
                         expect_control_frame = True
-                    # else:
-                    #     sleep(0.1)
+                    else:
+                        sleep(0.1)
                 
                 if not chunk_seq:
                     break
             
-            cv2.imshow("Preview", frame)
-            cv2.waitKey(100)
     
     # When everything done, release the capture
     cap.release()
