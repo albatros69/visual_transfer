@@ -61,12 +61,16 @@ if __name__ == '__main__':
     chunk_size = pyqrcodeng.tables.data_capacity[qr_version][ec_lvl][4]
     total_size = getsize(Args.input_file)
     total_chunks = (total_size-1)//chunk_size + 1
-    print(chunk_size, total_size, total_chunks)
-    
+    #print(chunk_size, total_size, total_chunks)
+
+    # Setup fullscreen window to display the QR/bar-code
+    cv2.namedWindow("Image", cv2.WND_PROP_FULLSCREEN)
+    cv2.setWindowProperty("Image", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+
     # Send control frame to ensure proper start at the other end
     buffer = io.BytesIO()
     qrcode = create_qrcode("---START---#{}#{}".format(total_chunks, chunk_size).encode('ascii'))
-    qrcode.png(buffer, scale=4)
+    qrcode.png(buffer, scale=2)
     show_image(buffer)
     
     with open(Args.input_file, mode='rb') as f:
@@ -78,7 +82,7 @@ if __name__ == '__main__':
             
             data = f.read(chunk_size)
             qrcode = create_qrcode(data)
-            qrcode.png(buffer, scale=4)
+            qrcode.png(buffer, scale=2)
             show_image(buffer)
 
             chunk -= 1
