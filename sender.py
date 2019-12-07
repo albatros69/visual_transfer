@@ -3,16 +3,17 @@
 # vim: set fileencoding=utf-8 sw=4 ts=4 et:
 
 
-from os.path import getsize
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 import io
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from base64 import b64encode
+from os.path import getsize
 from time import sleep
 
+import cv2
+import numpy
 import pyqrcodeng
 from barcode import Code128
 from barcode.writer import ImageWriter
-import cv2
-import numpy
 
 
 def create_qrcode(data):

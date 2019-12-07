@@ -4,10 +4,11 @@
 
 
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from base64 import b64decode
 from time import sleep
 
 import cv2
-from pyzbar.pyzbar import decode, ZBarSymbol
+from pyzbar.pyzbar import ZBarSymbol, decode
 
 
 if __name__ == '__main__':
