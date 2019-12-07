@@ -18,7 +18,7 @@ from barcode.writer import ImageWriter
 
 def create_qrcode(data):
     content = b32encode(data).decode('ascii').replace('=', '%')
-    return pyqrcodeng.create(content, error=ec_lvl, version=qr_version, mode='alphanumeric')
+    return pyqrcodeng.create(content, error=ec_lvl, version=qr_version, mode='alphanumeric', encoding='ascii')
 
 def show_image(buf):
     buf.flush()
