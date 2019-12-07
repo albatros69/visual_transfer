@@ -11,6 +11,11 @@ import cv2
 from pyzbar.pyzbar import ZBarSymbol, decode
 
 
+def decode_data(data):
+    content = data.decode('ascii').replace('%', '=')
+    return b32decode(content.encode('ascii'))
+
+
 if __name__ == '__main__':
 
     Parser = ArgumentParser()
@@ -39,7 +44,7 @@ if __name__ == '__main__':
 
                 for a in decoded_objects:
                     if a.type == 'QRCODE':
-                        start_frame = b32decode(a.data.decode('ascii').replace('%', '=')).split('#')
+                        start_frame = decode_data(a.data).decode('ascii').split('#')
                         if start_frame[0] == '---START---':
                             print("START OK")
                             chunk_seq = int(start_frame[1])
@@ -59,7 +64,7 @@ if __name__ == '__main__':
                         expect_control_frame = False
                     elif a.type == 'QRCODE' and not expect_control_frame:
                         print("QRCODE OK")
-                        f.write(b32decode(a.data.decode('ascii').replace('%', '=')))
+                        f.write(decode_data(a.data))
                         expect_control_frame = True
                     else:
                         sleep(0.1)
