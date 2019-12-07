@@ -25,8 +25,8 @@ def show_image(buf):
     png = numpy.frombuffer(buf.read(), dtype=numpy.uint8)
     image = cv2.imdecode(png, cv2.IMREAD_UNCHANGED)
     cv2.imshow("Image", image)
-    cv2.waitKey(1000)
- 
+    cv2.waitKey(700)
+
     buffer.seek(0)
     buffer.truncate()
    # sleep(1)
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     else:
         qr_version = Args.version
     ec_lvl = Args.ec_lvl
-    
+
     # 4 for binary
     chunk_size = pyqrcodeng.tables.data_capacity[qr_version][ec_lvl][4]
     total_size = getsize(Args.input_file)
@@ -72,14 +72,14 @@ if __name__ == '__main__':
     qrcode = create_qrcode("---START---#{}#{}".format(total_chunks, chunk_size).encode('ascii'))
     qrcode.png(buffer, scale=2)
     show_image(buffer)
-    
+
     with open(Args.input_file, mode='rb') as f:
         chunk = total_chunks
         while chunk > 0:
             barcode = Code128(str(chunk), writer=ImageWriter())
             barcode.write(buffer)
             show_image(buffer)
-            
+
             data = f.read(chunk_size)
             qrcode = create_qrcode(data)
             qrcode.png(buffer, scale=2)
