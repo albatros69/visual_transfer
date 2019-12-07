@@ -76,7 +76,7 @@ if __name__ == '__main__':
     with open(Args.input_file, mode='rb') as f:
         chunk = total_chunks
         while chunk > 0:
-            barcode = Code128(str(chunk-1), writer=ImageWriter())
+            barcode = Code128(str(chunk), writer=ImageWriter())
             barcode.write(buffer)
             show_image(buffer)
             
@@ -86,5 +86,9 @@ if __name__ == '__main__':
             show_image(buffer)
 
             chunk -= 1
-            
+
+        barcode = Code128(str(chunk), writer=ImageWriter())
+        barcode.write(buffer)
+        show_image(buffer)
+
     cv2.destroyAllWindows()
