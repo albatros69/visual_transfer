@@ -4,7 +4,7 @@
 
 
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
-from base64 import b64decode
+from base64 import b32decode
 from time import sleep
 
 import cv2
@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
                 for a in decoded_objects:
                     if a.type == 'QRCODE':
-                        start_frame = a.data.decode('ascii').split('#')
+                        start_frame = b32decode(a.data.decode('ascii').replace('%', '=')).split('#')
                         if start_frame[0] == '---START---':
                             print("START OK")
                             chunk_seq = int(start_frame[1])
@@ -59,7 +59,7 @@ if __name__ == '__main__':
                         expect_control_frame = False
                     elif a.type == 'QRCODE' and not expect_control_frame:
                         print("QRCODE OK")
-                        f.write(b64decode(a.data))
+                        f.write(b32decode(a.data.decode('ascii').replace('%', '=')))
                         expect_control_frame = True
                     else:
                         sleep(0.1)

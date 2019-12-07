@@ -5,7 +5,7 @@
 
 import io
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
-from base64 import b64encode
+from base64 import b32encode
 from os.path import getsize
 from time import sleep
 
@@ -17,7 +17,8 @@ from barcode.writer import ImageWriter
 
 
 def create_qrcode(data):
-    return pyqrcodeng.create(b64encode(data), error=ec_lvl, version=qr_version, mode='alphanumeric')
+    content = b32encode(data).decode('ascii').replace('=', '%')
+    return pyqrcodeng.create(content, error=ec_lvl, version=qr_version, mode='alphanumeric')
 
 def show_image(buf):
     buf.flush()
@@ -58,8 +59,8 @@ if __name__ == '__main__':
         qr_version = Args.version
     ec_lvl = Args.ec_lvl
 
-    # 2 for alphanumeric, 4 for binary
-    chunk_size = pyqrcodeng.tables.data_capacity[qr_version][ec_lvl][2]
+    # 2 for alphanumeric, 4 for binary + base32 ratio
+    chunk_size = pyqrcodeng.tables.data_capacity[qr_version][ec_lvl][2]*5//40*5
     total_size = getsize(Args.input_file)
     total_chunks = (total_size-1)//chunk_size + 1
 
