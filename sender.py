@@ -17,7 +17,7 @@ from barcode.writer import ImageWriter
 
 
 def create_qrcode(data):
-    return pyqrcodeng.create(data, error=ec_lvl, version=qr_version, mode='binary')
+    return pyqrcodeng.create(b64encode(data), error=ec_lvl, version=qr_version, mode='alphanumeric')
 
 def show_image(buf):
     buf.flush()
@@ -58,11 +58,10 @@ if __name__ == '__main__':
         qr_version = Args.version
     ec_lvl = Args.ec_lvl
 
-    # 4 for binary
-    chunk_size = pyqrcodeng.tables.data_capacity[qr_version][ec_lvl][4]
+    # 2 for alphanumeric, 4 for binary
+    chunk_size = pyqrcodeng.tables.data_capacity[qr_version][ec_lvl][2]
     total_size = getsize(Args.input_file)
     total_chunks = (total_size-1)//chunk_size + 1
-    #print(chunk_size, total_size, total_chunks)
 
     # Setup fullscreen window to display the QR/bar-code
     cv2.namedWindow("Image", cv2.WND_PROP_FULLSCREEN)

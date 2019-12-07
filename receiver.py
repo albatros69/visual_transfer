@@ -59,7 +59,7 @@ if __name__ == '__main__':
                         expect_control_frame = False
                     elif a.type == 'QRCODE' and not expect_control_frame:
                         print("QRCODE OK")
-                        f.write(a.data)
+                        f.write(b64decode(a.data))
                         expect_control_frame = True
                     else:
                         sleep(0.1)
