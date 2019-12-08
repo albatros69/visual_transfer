@@ -40,10 +40,13 @@ if __name__ == '__main__':
         missing_chunks = []
         started = False
         expect_control_frame = True
-        
+
         while return_val:
             return_val, frame = cap.read()
             decoded_objects = decode(frame, symbols=[ZBarSymbol.CODE128, ZBarSymbol.QRCODE])
+
+            #if decoded_objects:
+                #print(decoded_objects[0].data)
 
             if not started:
                 cv2.imshow("Preview", frame)
@@ -75,13 +78,14 @@ if __name__ == '__main__':
                         expect_control_frame = True
                     else:
                         sleep(0.1)
-                
+
                 if not chunk_seq:
                     break
-            
-    
+
+
     # When everything done, release the capture
     cap.release()
     cv2.destroyAllWindows()
-    
+
     print('Missing chunks:', missing_chunks)
+
