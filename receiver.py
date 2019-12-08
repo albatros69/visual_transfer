@@ -12,8 +12,11 @@ from pyzbar.pyzbar import ZBarSymbol, decode
 
 
 def decode_data(data):
-    content = data.decode('ascii').replace('%', '=')
-    return b32decode(content.encode('ascii'))
+    try:
+        content = data.decode('ascii').replace('%', '=')
+        return b32decode(content.encode('ascii'))
+    except:
+        return b''
 
 
 if __name__ == '__main__':
