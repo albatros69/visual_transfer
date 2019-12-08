@@ -27,8 +27,12 @@ if __name__ == '__main__':
     Args = Parser.parse_args()
 
     cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+    #cap.set(cv2.CAP_PROP_FPS, 24)
+    #cap.set(cv2.CAP_PROP_AUTO_WB, 1)
     return_val, frame = cap.read()
-    
+
     with open(Args.output_file, mode='wb') as f:
         chunk_size = 0
         chunk_seq = 0
