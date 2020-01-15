@@ -4,7 +4,7 @@
 
 
 import io
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, ArgumentError
 from base64 import b32encode
 from os.path import getsize
 from time import sleep
@@ -42,9 +42,14 @@ if __name__ == '__main__':
     Parser.add_argument("-e", "--error-correction", dest="ec_lvl", action="store",
                         choices=pyqrcodeng.tables.error_level.keys(), default='L',
                         help="Error correction level (default: %(default)s)")
-    Parser.add_argument("-t", "-terminal", action="store", metavar="OUTPUT",
-                        choices = ("text", "graphic"), default='graphic',
-                        help="Terminal type")
+    #Parser.add_argument("-t", "--terminal", action="store", metavar="OUTPUT",
+    #                    choices = ("text", "graphic"), default='graphic',
+    #                    help="Terminal type")
+    Parser.add_argument("-m", "--mode", dest="mode", action="store", #metavar="MODE",
+                        choices=("full", "partial"), default='full',
+                        help="Transfer mode (default: %(default)s)")
+    Parser.add_argument("-c", "-chunks", dest="chunks", action="store", metavar="CHUNKS_LIST",
+                        type=int, nargs='+', help="Chunks list in partial mode")
     group = Parser.add_mutually_exclusive_group()
     group.add_argument("-v", "--version", dest="version", action="store",
                        type=int, default=40,
@@ -52,6 +57,9 @@ if __name__ == '__main__':
     group.add_argument("-s", "--size", dest="size", action="store",
                        type=int, help="Size of the QR Code")
     Args = Parser.parse_args()
+
+    if Args.mode.lower() == "partial" and not Args.chunks:
+        raise ArgumentError('chunks', "In partial mode, chunks list must be provided.")
 
     if Args.size:
         qr_version = max(int((Args.size - 17)/4), 1)
@@ -70,13 +78,25 @@ if __name__ == '__main__':
 
     # Send control frame to ensure proper start at the other end
     buffer = io.BytesIO()
-    qrcode = create_qrcode("---START---#{}#{}".format(total_chunks, chunk_size).encode('ascii'))
+    if Args.mode.lower() == 'partial':
+        qrcode = create_qrcode("---PARTIAL---#{}#{}".format(total_chunks, chunk_size).encode('ascii'))
+    else:
+        qrcode = create_qrcode("---START---#{}#{}".format(total_chunks, chunk_size).encode('ascii'))
     qrcode.png(buffer, scale=2)
     show_image(buffer)
 
     with open(Args.input_file, mode='rb') as f:
-        chunk = total_chunks
+        if Args.mode.lower() == "partial":
+            chunks_list = Args.chunks
+            chunk = len(chunks_list)
+        else:
+            chunk = total_chunks
         while chunk > 0:
+            if Args.mode.lower() == 'partial':
+                cursor = chunks_list.pop()
+                barcode = Code128(str(cursor), writer=ImageWriter())
+                f.tell((total_chunks-cursor)*chunk_size)
+
             barcode = Code128(str(chunk), writer=ImageWriter())
             barcode.write(buffer)
             show_image(buffer)

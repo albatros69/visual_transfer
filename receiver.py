@@ -37,6 +37,7 @@ if __name__ == '__main__':
         chunk_size = 0
         chunk_seq = 0
         old_chunk_seq = 0
+        mode = ''
         missing_chunks = []
         started = False
         expect_control_frame = True
@@ -57,7 +58,15 @@ if __name__ == '__main__':
                         start_frame = decode_data(a.data).decode('ascii').split('#')
                         if start_frame[0] == '---START---':
                             print("START OK")
-                            chunk_seq = int(start_frame[1])
+                            mode = 'full'
+                            total_chunk = int(start_frame[1])
+                            chunk_size = int(start_frame[2])
+                            started = True
+                            expect_control_frame = True
+                        elif start_frame[0] == '---PARTIAL---':
+                            print("PARTIAL OK")
+                            mode = 'partial'
+                            total_chunk = int(start_frame[1])
                             chunk_size = int(start_frame[2])
                             started = True
                             expect_control_frame = True
@@ -66,11 +75,14 @@ if __name__ == '__main__':
                     if a.type == 'CODE128' and expect_control_frame:
                         chunk_seq = int(a.data)
                         print("Barcode #%d OK" % (chunk_seq, ))
-                        if old_chunk_seq - chunk_seq > 1:
-                            for i in range(old_chunk_seq, chunk_seq, -1):
-                                missing_chunks.append(i)
-                                f.write(b'0'*chunk_size)
-                        old_chunk_seq = chunk_seq
+                        if mode == 'partial':
+                            f.tell((total_chunk-chunk_seq)*chunk_size)
+                        else:
+                            if old_chunk_seq - chunk_seq > 1:
+                                for i in range(old_chunk_seq, chunk_seq, -1):
+                                    missing_chunks.append(i)
+                                    f.write(b'0'*chunk_size)
+                            old_chunk_seq = chunk_seq
                         expect_control_frame = False
                     elif a.type == 'QRCODE' and not expect_control_frame:
                         print("QRCODE OK")
