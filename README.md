@@ -9,10 +9,10 @@ might be way to go. But imagine you want to get data out of a bastion host you c
 graphic or text).
 
 The only channel remaining is this particular terminal. So you just have somehow to channel your data in a picture (or
-stream of picture) and record it on the other side. This would have to be reliable though, so any lossy encoding has to
+stream of pictures) and record it on the other side. This would have to be reliable though, so any lossy encoding has to
 be avoided. But, it does ring a bell: you do that every time you read a QR-code on your smartphone...
 
-Then why not splitting your file in as many chunk as needed, encoding each chunk in a QR-code, and display them on the
+Then why not splitting your file in as many chunks as needed, encoding each chunk in a QR-code, and display them on the
 screen. On the other end, you can extract the data out of each QR-code and stitch them together to get the original file.
 This is the basic idea, and after a bit of polishing, I have my PoC!
 
