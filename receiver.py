@@ -22,7 +22,7 @@ def decode_data(data):
 if __name__ == '__main__':
 
     Parser = ArgumentParser()
-    Parser.add_argument("output_file", action="store", metavar='INPUT_FILE',
+    Parser.add_argument("output_file", action="store", metavar='OUPUT_FILE',
                         help="Output file")
     Args = Parser.parse_args()
 
