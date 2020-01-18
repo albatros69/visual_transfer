@@ -87,17 +87,17 @@ if __name__ == '__main__':
 
     with open(Args.input_file, mode='rb') as f:
         if Args.mode.lower() == "partial":
-            chunks_list = Args.chunks
+            chunks_list = sorted(Args.chunks)
             chunk = len(chunks_list)
         else:
             chunk = total_chunks
         while chunk > 0:
             if Args.mode.lower() == 'partial':
                 cursor = chunks_list.pop()
+                f.seek((total_chunks-cursor)*chunk_size)
                 barcode = Code128(str(cursor), writer=ImageWriter())
-                f.tell((total_chunks-cursor)*chunk_size)
-
-            barcode = Code128(str(chunk), writer=ImageWriter())
+            else:
+                barcode = Code128(str(chunk), writer=ImageWriter())
             barcode.write(buffer)
             show_image(buffer)
 
