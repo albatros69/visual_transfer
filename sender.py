@@ -48,14 +48,14 @@ if __name__ == '__main__':
     Parser.add_argument("-m", "--mode", dest="mode", action="store", #metavar="MODE",
                         choices=("full", "partial"), default='full',
                         help="Transfer mode (default: %(default)s)")
-    Parser.add_argument("-c", "-chunks", dest="chunks", action="store", metavar="CHUNKS_LIST",
+    Parser.add_argument("-c", "-chunks", dest="chunks", action="store", metavar="CHUNK_NB",
                         type=int, nargs='+', help="Chunks list in partial mode")
     group = Parser.add_mutually_exclusive_group()
     group.add_argument("-v", "--version", dest="version", action="store",
                        type=int, default=40,
-                       help="Version number of the QR Code (default: %(default)d)")
+                       help="Version number of the QR-code (default: %(default)d)")
     group.add_argument("-s", "--size", dest="size", action="store",
-                       type=int, help="Size of the QR Code")
+                       type=int, help="Size of the QR-code")
     Args = Parser.parse_args()
 
     if Args.mode.lower() == "partial" and not Args.chunks:
