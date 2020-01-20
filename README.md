@@ -58,4 +58,4 @@ On the receiver, you just have to give the output file. After you launch the com
 opportunity to set the image capture by the webcam correctly: try to get as much as the other side screen, to improve
 the quality of the transfer. As soon as the start of the transfer is detected, the window is closed. You can stop the
 transfer before completion by hitting Ctrl+C. At the end of the transfer, a list of missed chunks (if any) is provided.
-You can start again to transfer those ones by starting again the sender in partial mode.
+You can transfer those ones by starting again the sender in partial mode.
