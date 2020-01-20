@@ -21,7 +21,7 @@ This is the basic idea, and after a bit of polishing, I have my PoC!
 ## The sender
 
     usage: sender.py [-h] [-e {L,l,7%,0.7,M,m,15%,0.15,Q,q,25%,0.25,H,h,30%,0.3}]
-                     [-m {full,partial}] [-c CHUNKS_LIST [CHUNKS_LIST ...]]
+                     [-m {full,partial}] [-c CHUNK_NB [CHUNK_NB ...]]
                      [-v VERSION | -s SIZE]
                      INPUT_FILE
 
