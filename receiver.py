@@ -40,6 +40,7 @@ if __name__ == '__main__':
     missing_chunks = []
     started = False
     expect_control_frame = True
+    f = None
 
     while return_val:
         return_val, frame = cap.read()
@@ -61,6 +62,7 @@ if __name__ == '__main__':
                         total_chunk = int(start_frame[1])
                         chunk_size = int(start_frame[2])
                         chunk_seq = total_chunk
+                        old_chunk_seq = chunk_seq+1
                         started = True
                         expect_control_frame = True
                         f = open(Args.output_file, mode='wb')
@@ -89,8 +91,8 @@ if __name__ == '__main__':
                             old_chunk_seq = chunk_seq
                             expect_control_frame = False
                         elif old_chunk_seq == chunk_seq:
-                            expect_control_frame = True
-                        else:
+                            pass
+                        elif old_chunk_seq-chunk_seq == 1:
                             old_chunk_seq = chunk_seq
                             expect_control_frame = False
                 elif a.type == 'QRCODE' and not expect_control_frame:
