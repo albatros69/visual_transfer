@@ -74,7 +74,7 @@ if __name__ == '__main__':
                         chunk_seq = total_chunk
                         started = True
                         expect_control_frame = True
-                        f = open(Args.output_file, mode='wb+')
+                        f = open(Args.output_file, mode='r+b')
         else:
             for a in decoded_objects:
                 if a.type == 'CODE128' and expect_control_frame:
