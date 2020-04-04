@@ -84,8 +84,8 @@ if __name__ == '__main__':
                         f.seek((total_chunk-chunk_seq)*chunk_size)
                         expect_control_frame = False
                     else:
-                        if old_chunk_seq - chunk_seq > 1:
-                            for i in range(old_chunk_seq, chunk_seq, -1):
+                        if old_chunk_seq-chunk_seq > 1:
+                            for i in range(old_chunk_seq-1, chunk_seq, -1):
                                 missing_chunks.append(i)
                                 f.write(b'0'*chunk_size)
                             old_chunk_seq = chunk_seq
