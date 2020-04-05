@@ -16,7 +16,8 @@ from barcode import Code128
 from barcode.writer import ImageWriter
 
 
-def create_qrcode(data):
+def create_qrcode(header, payload):
+    data = b''.join([ header[k].to_bytes(header_size[k], 'big') for k in header ]) + payload
     content = b32encode(data).decode('ascii').replace('=', '%')
     return pyqrcodeng.create(content, error=ec_lvl, version=qr_version, mode='alphanumeric', encoding='ascii')
 
@@ -27,7 +28,7 @@ def show_image(buf):
     png = numpy.frombuffer(buf.read(), dtype=numpy.uint8)
     image = cv2.imdecode(png, cv2.IMREAD_UNCHANGED)
     cv2.imshow("Image", image)
-    cv2.waitKey(700)
+    cv2.waitKey(200)
 
     buffer.seek(0)
     buffer.truncate()
@@ -66,50 +67,48 @@ if __name__ == '__main__':
     else:
         qr_version = Args.version
     ec_lvl = Args.ec_lvl
+    mode = Args.mode.lower() == 'partial'
 
+    total_size = getsize(Args.input_file)
+    header_size = { 'mode': 1, 'chunk': 4 , 'size': 8 }
+    header = { 'mode': int(mode), 'chunk': 0 , 'size': total_size }
     # 2 for alphanumeric, 4 for binary + base32 ratio
     chunk_size = pyqrcodeng.tables.data_capacity[qr_version][ec_lvl][2]*5//40*5
-    total_size = getsize(Args.input_file)
+    for v in header_size.values():
+        chunk_size -= v
     total_chunks = (total_size-1)//chunk_size + 1
 
     # Setup fullscreen window to display the QR/bar-code
     cv2.namedWindow("Image", cv2.WND_PROP_FULLSCREEN)
     cv2.setWindowProperty("Image", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
-    # Send control frame to ensure proper start at the other end
     buffer = io.BytesIO()
-    if Args.mode.lower() == 'partial':
-        qrcode = create_qrcode("---PARTIAL---#{}#{}".format(total_chunks, chunk_size).encode('ascii'))
-    else:
-        qrcode = create_qrcode("---START---#{}#{}".format(total_chunks, chunk_size).encode('ascii'))
-    qrcode.png(buffer, scale=2)
-    show_image(buffer)
 
     with open(Args.input_file, mode='rb') as f:
-        if Args.mode.lower() == "partial":
+        if mode:
             chunks_list = sorted(Args.chunks)
             chunk = len(chunks_list)
         else:
             chunk = total_chunks
+
         while chunk > 0:
-            if Args.mode.lower() == 'partial':
+            if mode:
                 cursor = chunks_list.pop()
                 f.seek((total_chunks-cursor)*chunk_size)
-                barcode = Code128(str(cursor), writer=ImageWriter())
+                header['chunk'] = cursor
             else:
-                barcode = Code128(str(chunk), writer=ImageWriter())
-            barcode.write(buffer)
-            show_image(buffer)
+                header['chunk'] = chunk
 
             data = f.read(chunk_size)
-            qrcode = create_qrcode(data)
+            qrcode = create_qrcode(header, data)
             qrcode.png(buffer, scale=2)
             show_image(buffer)
 
             chunk -= 1
 
-        barcode = Code128(str(chunk), writer=ImageWriter())
-        barcode.write(buffer)
+        header['chunk'] = 0
+        qrcode = create_qrcode(header, b'')
+        qrcode.png(buffer, scale=2)
         show_image(buffer)
 
     cv2.destroyAllWindows()
