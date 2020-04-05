@@ -44,6 +44,10 @@ You can set the different parameters of the QR-code (size or version, error corr
 after you launch the command: a fullscreen window will appear and display the stream of codes. In partial mode, only the
 the specified chunks are transfered.
 
+After a few tests, I reckon I'm limited to version 25. I guess this is due to the resolution of the webcam on my laptop.
+I will need to do some other tests as soon as I get a hand on a better webcam. I also tried with a sport camera, but it 
+doesn't bring any improvements (even if the resolution is supposed to be better). Maybe the wide-angle lens doesn't help.
+
 ## The receiver
 
     usage: receiver.py [-h] OUTPUT_FILE

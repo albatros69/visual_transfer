@@ -12,11 +12,15 @@ from pyzbar.pyzbar import ZBarSymbol, decode
 
 
 def decode_data(data):
-    try:
-        content = data.decode('ascii').replace('%', '=')
-        return b32decode(content.encode('ascii'))
-    except:
-        return b''
+    content = b32decode(data.decode('ascii').replace('%', '=').encode('ascii'))
+    cursor = 0
+    header = {}
+    for k,size in header_size.items():
+        header[k] = int.from_bytes(content[cursor:cursor+size], 'big')
+        cursor += size
+    payload = content[cursor:]
+
+    return header, payload
 
 
 if __name__ == '__main__':
@@ -27,19 +31,22 @@ if __name__ == '__main__':
     Args = Parser.parse_args()
 
     cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1024)
     #cap.set(cv2.CAP_PROP_FPS, 24)
     #cap.set(cv2.CAP_PROP_AUTO_WB, 1)
     return_val, frame = cap.read()
 
+    header_size = { 'mode': 1, 'chunk': 4 , 'size': 8 }
     chunk_size = 0
+    total_chunks = 0
+    remaining_size = 0
     chunk_seq = 0
     old_chunk_seq = 0
-    mode = ''
+    mode = False
     missing_chunks = []
     started = False
-    expect_control_frame = True
+    f = None
 
     while return_val:
         return_val, frame = cap.read()
@@ -52,63 +59,63 @@ if __name__ == '__main__':
             cv2.imshow("Preview", frame)
             cv2.waitKey(100)
 
-            for a in decoded_objects:
-                if a.type == 'QRCODE':
-                    start_frame = decode_data(a.data).decode('ascii').split('#')
-                    if start_frame[0] == '---START---':
-                        print("START OK")
-                        mode = 'full'
-                        total_chunk = int(start_frame[1])
-                        chunk_size = int(start_frame[2])
-                        chunk_seq = total_chunk
-                        started = True
-                        expect_control_frame = True
-                        f = open(Args.output_file, mode='wb')
-                    elif start_frame[0] == '---PARTIAL---':
-                        print("PARTIAL OK")
-                        mode = 'partial'
-                        total_chunk = int(start_frame[1])
-                        chunk_size = int(start_frame[2])
-                        chunk_seq = total_chunk
-                        started = True
-                        expect_control_frame = True
-                        f = open(Args.output_file, mode='wb+')
-        else:
-            for a in decoded_objects:
-                if a.type == 'CODE128' and expect_control_frame:
-                    chunk_seq = int(a.data)
-                    print("Barcode #%d OK %r" % (chunk_seq, expect_control_frame))
-                    if mode == 'partial':
-                        f.seek((total_chunk-chunk_seq)*chunk_size)
-                        expect_control_frame = False
-                    else:
-                        if old_chunk_seq - chunk_seq > 1:
-                            for i in range(old_chunk_seq, chunk_seq, -1):
-                                missing_chunks.append(i)
-                                f.write(b'0'*chunk_size)
-                            old_chunk_seq = chunk_seq
-                            expect_control_frame = False
-                        elif old_chunk_seq == chunk_seq:
-                            expect_control_frame = True
-                        else:
-                            old_chunk_seq = chunk_seq
-                            expect_control_frame = False
-                elif a.type == 'QRCODE' and not expect_control_frame:
-                    print("QRCODE OK %r" % (expect_control_frame,))
-                    f.write(decode_data(a.data))
-                    expect_control_frame = True
-                else:
-                    sleep(0.1)
+        for a in decoded_objects:
+            if a.type != 'QRCODE':
+                continue
 
-            if not chunk_seq:
-                break
+            started = True
+            header, payload = decode_data(a.data)
+
+            chunk_seq = header['chunk']
+            chunk_size = len(payload)
+            if not total_chunks:
+                total_chunks = (header['size']-1)//chunk_size + 1
+
+            mode = header['mode']
+            if not f:
+                if mode:
+                    f = open(Args.output_file, mode='r+b')
+                else:
+                    f = open(Args.output_file, mode='wb')
+
+            if mode:
+                if old_chunk_seq == chunk_seq:
+                    continue
+                print("QRCode #%d OK %d" % (header['chunk'], remaining_size))
+                old_chunk_seq = chunk_seq
+                f.seek((total_chunks-chunk_seq)*chunk_size)
+            else:
+                if old_chunk_seq-chunk_seq > 1:
+                    for i in range(old_chunk_seq-1, chunk_seq, -1):
+                        missing_chunks.append(i)
+                        remaining_size -= chunk_size
+                        f.write(b'0'*chunk_size)
+                    old_chunk_seq = chunk_seq
+                elif old_chunk_seq == chunk_seq: # QRCode captured twice
+                    continue
+                else: #if old_chunk_seq-chunk_seq == 1:
+                    print("QRCode #%d OK %d" % (header['chunk'], remaining_size))
+                    old_chunk_seq = chunk_seq
+
+            if remaining_size and started:
+                remaining_size -= chunk_size
+            elif chunk_size:
+                remaining_size = header['size'] - chunk_size
+            f.write(payload)
+
+        if started and not chunk_seq:
+            break
 
 
     if f:
+        f.truncate(header['size'])
         f.close()
     # When everything done, release the capture
     cap.release()
     cv2.destroyAllWindows()
 
-    print('Missing chunks:', missing_chunks)
+    if remaining_size != 0 and not mode:
+        print('File not fully received (%d missing bytes): some chunks might also be missing at the beginning of the transfer.' % (remaining_size, ))
+    if missing_chunks:
+        print('Missing chunks:', missing_chunks)
 
