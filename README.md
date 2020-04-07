@@ -8,8 +8,8 @@ Then, you need to think creatively: what are the other way of getting data. [Sou
 might be a way to go. But imagine you want to get data out of a bastion host you can only get a terminal onto (either
 graphic or text).
 
-The only available channel remaining is this particular terminal. So you just have somehow to channel your data in a 
-picture (or stream of pictures) and record it on the other side. This would have to be reliable though, so any lossy 
+The only available channel remaining is this particular terminal. So you just have somehow to channel your data in a
+picture (or stream of pictures) and record it on the other side. This would have to be reliable though, so any lossy
 encoding has to be avoided. Actually, it does ring a bell: you do that every time you read a QR-code on your smartphone...
 
 Then why not split your file in as many chunks as needed, encode each chunk in a QR-code, and display them on the screen.
@@ -31,18 +31,18 @@ As exposed above, the original file is splitted in chunks. The sender sends with
 
 There is a waste of bits for the first field: let's assume this is on purpose, for future use. The header and payload
 are concatenated and encoded in base32 (with the '=' sign replaced by a '#'), before being encoded in the QR-code in
-alphanumeric mode (thus the '='/'#' shenanigan to cope with the two different alphabet). All this is a tradeoff to put as
-much data inside a single QR-code. Binary mode is not a reliable solution because of the decoders that often choke on
-pure binary data.
+alphanumeric mode (thus the '='/'#' shenanigan to cope with the two different alphabets). Binary mode is not a
+reliable solution because of the decoders that often choke on pure binary data. All this is then a tradeoff to put as
+much data as possible inside a single QR-code.
 
 Based on all this, you should choose the version and the EC level of the QR-code based on your hardware (screen size,
 webcam quality, etc.) but also to accomodate for this header, meaning that, for high and quartile EC level, any version
 greater than 3 is sufficient, and for medium and low, any version greater than 2.
 
 There is also obviously a structural limit to the size of the file you can transfer. First, as the size is encoded on 64
-bits, you are limited by this, but this should be too much of an issue. Secondly, the chunk sequence number on 32 bits
-also limits the total size, depending essentially on the version and EC level of the QR-code. For instance, with a v10
-'L' QR-code, you can transfer up to 920GB. If you use v25 instead, you will be able to transfer up to 4.5TB.
+bits, you are limited by this, but this should not be too much of an issue. Secondly, the chunk sequence number on 32
+bits also limits the total size, depending essentially on the version and EC level of the QR-code. For instance, with a
+v10 'L' QR-code, you can transfer up to 920GB. If you use v25 instead, you will be able to transfer up to 4.5TB.
 
 ## The sender
 
@@ -71,7 +71,7 @@ after you launch the command: a fullscreen window will appear and display the st
 the specified chunks are transfered.
 
 After a few tests, I reckon I'm limited to version 25. I guess this is due to the resolution of the webcam on my laptop.
-I will need to do some other tests as soon as I get a hand on a better webcam. I also tried with a sport camera, but it 
+I will need to do some other tests as soon as I get a hand on a better webcam. I also tried with a sport camera, but it
 doesn't bring any improvements (even if the resolution is supposed to be better). Maybe the wide-angle lens doesn't help.
 
 ## The receiver
