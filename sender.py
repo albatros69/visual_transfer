@@ -35,7 +35,6 @@ def show_image(buf):
 
     buffer.seek(0)
     buffer.truncate()
-   # sleep(1)
 
 
 if __name__ == '__main__':

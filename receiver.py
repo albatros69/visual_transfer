@@ -52,9 +52,6 @@ if __name__ == '__main__':
         return_val, frame = cap.read()
         decoded_objects = decode(frame, symbols=[ZBarSymbol.CODE128, ZBarSymbol.QRCODE])
 
-        #if decoded_objects:
-            #print(decoded_objects[0].data)
-
         if not started:
             cv2.imshow("Preview", frame)
             cv2.waitKey(100)
