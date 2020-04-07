@@ -12,8 +12,6 @@ from time import sleep
 import cv2
 import numpy
 import pyqrcodeng
-from barcode import Code128
-from barcode.writer import ImageWriter
 
 
 def create_qrcode(header, payload):
