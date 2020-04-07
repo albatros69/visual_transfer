@@ -17,7 +17,10 @@ from barcode.writer import ImageWriter
 
 
 def create_qrcode(header, payload):
-    data = b''.join([ header[k].to_bytes(header_size[k], 'big') for k in header ]) + payload
+    try:
+        data = b''.join([ header[k].to_bytes(header_size[k], 'big') for k in header ]) + payload
+    except OverflowError:
+        raise ValueError('The chosen file is too big to be transfered using these QR-code parameters.')
     content = b32encode(data).decode('ascii').replace('=', '%')
     return pyqrcodeng.create(content, error=ec_lvl, version=qr_version, mode='alphanumeric', encoding='ascii')
 
@@ -76,7 +79,11 @@ if __name__ == '__main__':
     chunk_size = pyqrcodeng.tables.data_capacity[qr_version][ec_lvl][2]*5//40*5
     for v in header_size.values():
         chunk_size -= v
+    if chunk_size <= 0:
+        raise ValueError("The chosen QR-code parameters can't accomodate the header size.")
     total_chunks = (total_size-1)//chunk_size + 1
+    if total_chunks > 256**header_size['chunk'] or total_size >= 256**header_size['size']:
+        raise ValueError('The chosen file is too big to be transfered using these QR-code parameters.')
 
     # Setup fullscreen window to display the QR/bar-code
     cv2.namedWindow("Image", cv2.WND_PROP_FULLSCREEN)
