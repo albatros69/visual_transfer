@@ -16,7 +16,33 @@ Then why not split your file in as many chunks as needed, encode each chunk in a
 On the other end, you can extract the data out of each QR-code and stitch them together to get the original file. This is
 the basic idea, and after a bit of polishing, I have my PoC!
 
-## Transfer principle
+## Transfer principles
+
+As exposed above, the original file is splitted in chunks. The sender sends within each QRcode a header and the payload
+(the chunk content, as binary). The header is 15-byte long and consists in three fields:
+
+|M|CSEQ|SIZE    |
+|-|----|--------|
+|1|0123|01234567|
+
+- the transfer mode (full/0 or partial/1),
+- the chunk sequence number (4 bytes),
+- the total file size (8 bytes).
+
+There is a waste of bits for the first field: let's assume this is on purpose, for future use. The header and payload
+are concatenated and encoded in base32 (with the '=' sign replaced by a '#'), before being encoded in the QR-code in
+alphanumeric mode (thus the '='/'#' shenanigan to cope with the two different alphabet). All this is a tradeoff to put as
+much data inside a single QR-code. Binary mode is not a reliable solution because of the decoders that often choke on
+pure binary data.
+
+Based on all this, you should choose the version and the EC level of the QR-code based on your hardware (screen size,
+webcam quality, etc.) but also to accomodate for this header, meaning that, for high and quartile EC level, any version
+greater than 3 is sufficient, and for medium and low, any version greater than 2.
+
+There is also obviously a structural limit to the size of the file you can transfer. First, as the size is encoded on 64
+bits, you are limited by this, but this should be too much of an issue. Secondly, the chunk sequence number on 32 bits
+also limits the total size, depending essentially on the version and EC level of the QR-code. For instance, with a v10
+'L' QR-code, you can transfer up to 920GB. If you use v25 instead, you will be able to transfer up to 4.5TB.
 
 ## The sender
 
