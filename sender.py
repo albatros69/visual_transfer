@@ -53,7 +53,7 @@ if __name__ == '__main__':
                         type=int, nargs='+', help="Chunks list in partial mode")
     group = Parser.add_mutually_exclusive_group()
     group.add_argument("-v", "--version", dest="version", action="store",
-                       type=int, default=40,
+                       type=int, default=20,
                        help="Version number of the QR-code (default: %(default)d)")
     group.add_argument("-s", "--size", dest="size", action="store",
                        type=int, help="Size of the QR-code")

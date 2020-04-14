@@ -23,7 +23,7 @@ As exposed above, the original file is splitted in chunks. The sender sends with
 
 |M|CSEQ|SIZE    |
 |-|----|--------|
-|1|0123|01234567|
+|1|1234|12345678|
 
 - the transfer mode (full/0 or partial/1),
 - the chunk sequence number (4 bytes),
@@ -63,7 +63,7 @@ v10 'L' QR-code, you can transfer up to 920GB. If you use v25 instead, you will 
         -c CHUNK_NB [CHUNK_NB ...], -chunks CHUNK_NB [CHUNK_NB ...]
                               Chunks list in partial mode
         -v VERSION, --version VERSION
-                              Version number of the QR-code (default: 40)
+                              Version number of the QR-code (default: 20)
         -s SIZE, --size SIZE  Size of the QR-code
 
 You can set the different parameters of the QR-code (size or version, error correction). The transfer will start right
