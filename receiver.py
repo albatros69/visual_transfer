@@ -5,7 +5,6 @@
 
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from base64 import b32decode
-from time import sleep
 
 import cv2
 from pyzbar.pyzbar import ZBarSymbol, decode
@@ -115,4 +114,3 @@ if __name__ == '__main__':
         print('File not fully received (%d missing bytes): some chunks might also be missing at the beginning of the transfer.' % (remaining_size, ))
     if missing_chunks:
         print('Missing chunks:', missing_chunks)
-

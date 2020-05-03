@@ -3,11 +3,11 @@
 # vim: set fileencoding=utf-8 sw=4 ts=4 et:
 
 
-import io
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, ArgumentError
+from argparse import (ArgumentDefaultsHelpFormatter, ArgumentError,
+                      ArgumentParser)
 from base64 import b32encode
+from io import BytesIO
 from os.path import getsize
-from time import sleep
 
 import cv2
 import numpy
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     cv2.namedWindow("Image", cv2.WND_PROP_FULLSCREEN)
     cv2.setWindowProperty("Image", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
-    buffer = io.BytesIO()
+    buffer = BytesIO()
 
     with open(Args.input_file, mode='rb') as f:
         if mode:
