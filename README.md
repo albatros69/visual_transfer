@@ -68,7 +68,7 @@ v10 'L' QR-code, you can transfer up to 920GB. If you use v25 instead, you will 
 
 You can set the different parameters of the QR-code (size or version, error correction). The transfer will start right
 after you launch the command: a fullscreen window will appear and display the stream of codes. In partial mode, only the
-the specified chunks are transfered.
+specified chunks are transfered.
 
 After a few tests, I reckon I'm limited to version 25. I guess this is due to the resolution of the webcam on my laptop.
 I will need to do some other tests as soon as I get a hand on a better webcam. I also tried with a sport camera, but it
@@ -85,7 +85,7 @@ doesn't bring any improvements (even if the resolution is supposed to be better)
         -h, --help  show this help message and exit
 
 On the receiver, you just have to give the output file. After you launch the command, a window appear to give you the
-opportunity to set the image capture by the webcam correctly: try to get as much as the other side screen, to improve
+opportunity to set the image capture by the webcam correctly: try to get as much of the other side screen, to improve
 the quality of the transfer. As soon as the start of the transfer is detected, the window is closed. You can stop the
 transfer before completion by hitting Ctrl+C. At the end of the transfer, a list of missed chunks (if any) is provided.
 You can transfer those ones by starting again the sender in partial mode.
