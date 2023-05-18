@@ -30,8 +30,8 @@ As exposed above, the original file is splitted in chunks. The sender sends with
 - the total file size (8 bytes).
 
 There is a waste of bits for the first field: let's assume this is on purpose, for future use. The header and payload
-are concatenated and encoded in base32 (with the '=' sign replaced by a '#'), before being encoded in the QR-code in
-alphanumeric mode (thus the '='/'#' shenanigan to cope with the two different alphabets). Binary mode is not a
+are concatenated and encoded in base32 (with the `=` sign replaced by a `#`), before being encoded in the QR-code in
+alphanumeric mode (thus the `=`/`#` shenanigan to cope with the two different alphabets). Binary mode is not a
 reliable solution because of the decoders that often choke on pure binary data. All this is then a tradeoff to put as
 much data as possible inside a single QR-code.
 
