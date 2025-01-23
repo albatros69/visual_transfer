@@ -3,7 +3,7 @@
 ## A bit of context
 This tool is a kind of [Sneakernet](https://en.wikipedia.org/wiki/Sneakernet). I started this as a proof of concept,
 trying to see how to exfiltrate data from a computer when you have no network of course (or when any file transfer is
-unavalaible), but also no USB, Bluetooth or whatever mean to interact with this host apart from a screen and a keyboard.
+unavailable), but also no USB, Bluetooth or whatever mean to interact with this host apart from a screen and a keyboard.
 Then, you need to think creatively: what are the other way of getting data. [Sound](http://www.whence.com/minimodem/)
 might be a way to go. But imagine you want to get data out of a bastion host you can only get a terminal onto (either
 graphic or text).
